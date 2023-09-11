@@ -4,10 +4,11 @@ import com.example.elkredis.model.MessageDTO;
 import com.example.elkredis.model.MessageDTO1;
 import com.example.elkredis.model.Product;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IelkService {
-    public Optional<Product> findById(Long id );
-    public Product createProduct(Long id,Product p);
-
+     Optional<Product> findById(Long id );
+     Product UpdateProduct(Long id,Product p);
+     List<Product> findAll();
 }

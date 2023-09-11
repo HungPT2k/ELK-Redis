@@ -1,38 +1,39 @@
 package com.example.elkredis.Service;
 
-import com.example.elkredis.model.MessageDTO;
-import com.example.elkredis.model.MessageDTO1;
 import com.example.elkredis.model.Product;
-import com.example.elkredis.model.ProductDTO;
 import com.example.elkredis.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 @Component
 public class ElkService implements IelkService{
     @Autowired
     private ProductRepository productRepository;
 
+
+    @Cacheable(value = "findById",key = "#id",cacheManager = "cacheManager1")
+    @Override
     public Optional<Product> findById(Long id){
-      //  Long id= Long.valueOf(m.getParameters().get("id"));
         return   productRepository.findById(id);
     }
-    public Product createProduct(Long id,Product p){
+
+    @CacheEvict(value = "findAll", allEntries = true)
+    @CachePut(value = "findById",key = "#id")
+    @Override
+    public Product UpdateProduct(Long id, Product p){
         Optional<Product> product1 =productRepository.findById(id);
         product1.get().setName(p.getName());
         return productRepository.save(product1.get());
 
     }
-//    public Product updateProduct(MessageDTO m){
-//        Long id= Long.valueOf(m.getParameters().get("id"));
-//        ProductDTO product = (ProductDTO) m.getObject();
-//        Optional<Product> productOptional =productRepository.findById(id);
-//        if(productOptional.isPresent()){
-//            productOptional.get().setName(product.getName());
-//            return productRepository.save(productOptional.get());
-//        }
-//        return null;
-//    }
+    @Cacheable(value = "findAll" , cacheManager = "cacheManager")
+    @Override
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
 }

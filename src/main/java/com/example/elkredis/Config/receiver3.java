@@ -8,16 +8,13 @@ import com.example.elkredis.model.MessageDTO1;
 import com.example.elkredis.model.Product;
 import com.example.elkredis.model.ResponseCommon;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.lucene.store.Lock;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 @Service
@@ -28,9 +25,7 @@ public class receiver3 implements MessageListener { // mỗi class subscriber m�
     private final Publisher3 publisher;
     private final IelkService elkService;
     public static boolean check = false;
-    final Object lock = new Object();
     ObjectMapper mapper = new ObjectMapper();
-
 
     public receiver3(Publisher3 publisher, IelkService elkService) {
         this.publisher = publisher;
@@ -44,23 +39,23 @@ public class receiver3 implements MessageListener { // mỗi class subscriber m�
             MessageDTO m = mapper.readValue(message.getBody(), MessageDTO.class);
             LocalDateTime myObj = LocalDateTime.now();
             // quan sát request nhận đc trên redis gui
-            publisher.pushApiToRedisQueue(new MessageDTO1("",m.getMethod(),myObj.toString()));
+            publisher.addGuiRedis(new MessageDTO1("", m.getMethod(), myObj.toString()));
             switch (Objects.requireNonNull(m).getMethod()) {
                 case CommonConstant.Method.FINDBYID:
-                    synchronized (lock) {
-                        System.out.println("findByid .............ok");
-                        check = true;
-                        lock.notify();
-                        break;
-                    }
-                case CommonConstant.Method.UPDATEPRODUCT:
-                    synchronized (lock) {
-                        System.out.println("update .............ok");
-                        check = true;
-                        lock.notify();
-                        break;
-                    }
+                    System.out.println("findByid .............ok");
+                    check = true;
+                    break;
 
+                case CommonConstant.Method.UPDATEPRODUCT:
+
+                    System.out.println("update .............ok");
+                    check = true;
+                    break;
+
+                case CommonConstant.Method.FINDALL:
+                    System.out.println("findAll .............ok");
+                    check = true;
+                    break;
                 default:
                     System.out.println("Name method not find..........");
                     //    res= new ResponseCommon("404", "not found method", null);
@@ -77,44 +72,63 @@ public class receiver3 implements MessageListener { // mỗi class subscriber m�
 
     // method sẽ gọi đến redis queue trước khi dc thực thi
     public ResponseCommon findById(Long id) throws InterruptedException {
+        check = false;
+        ResponseCommon res;
         MessageDTO1 messageDTO = new MessageDTO1();
         messageDTO.setMethod("findById");
         messageDTO.setMessDetail("get product by id");
-        System.out.println(check);
-        synchronized (lock) {
-            publisher.publishAtoB(messageDTO);
-            try {
-                lock.wait();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            if (check) {
-                check = false;
-                return new ResponseCommon("200", "Get product by id " + id, elkService.findById(id));
-            }
-            return null;
+        System.out.println(elkService.findById(id).get().getName() + "-------------");
+        publisher.publishToA(messageDTO);
+        long startTime = System.currentTimeMillis(); //fetch starting time
+        while (!check && (System.currentTimeMillis() - startTime) < 2000) {
+            res = null;
         }
+        if (check) {
+            res = new ResponseCommon("200", "Get product by id " + id, elkService.findById(id));
+        } else {
+            res = new ResponseCommon("200", "queue null", null);
+        }
+        return res;
     }
 
 
-
-
     public ResponseCommon updateProduct(Long id, Product product) throws InterruptedException {
+        check = false;
+        ResponseCommon res;
         MessageDTO1 messageDTO = new MessageDTO1();
         messageDTO.setMethod("updateProduct");
         messageDTO.setMessDetail("Update product by id");
-        synchronized (lock) {
-            publisher.publishAtoB(messageDTO);
-            try {
-                lock.wait();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            if (check) {
-                check = false;
-                return new ResponseCommon("200", "Update product by id "+id, elkService.createProduct(id,product));
-            }
-            return null;
+        publisher.publishToA(messageDTO);
+        long startTime = System.currentTimeMillis(); //fetch starting time
+        while (!check && (System.currentTimeMillis() - startTime) < 2000) {
+            res = null;
         }
+        if (check) {
+            res = new ResponseCommon("200", "Update  product by id"+ id, elkService.UpdateProduct(id,product));
+        } else {
+            res = new ResponseCommon("200", "queue null", null);
+        }
+        return res;
+    }
+
+
+    public ResponseCommon findAllProduct() {
+        check = false;
+        ResponseCommon res;
+        MessageDTO1 messageDTO1 = new MessageDTO1();
+        messageDTO1.setMethod(CommonConstant.Method.FINDALL);
+        messageDTO1.setMessDetail("Find all product");
+        System.out.println(elkService.findAll().get(0).getName() + "____________");
+        publisher.publishToA(messageDTO1);
+        long startTime = System.currentTimeMillis(); //fetch starting time
+        while (!check && (System.currentTimeMillis() - startTime) < 2000) {
+            res = null;
+        }
+        if (check) {
+            res = new ResponseCommon("200", "Find all product ", elkService.findAll());
+        } else {
+            res = new ResponseCommon("200", "queue null", null);
+        }
+        return res;
     }
 }
