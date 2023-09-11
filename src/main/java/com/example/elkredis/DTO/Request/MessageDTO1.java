@@ -1,4 +1,4 @@
-package com.example.elkredis.model;
+package com.example.elkredis.DTO.Request;
 
 
 import lombok.AllArgsConstructor;

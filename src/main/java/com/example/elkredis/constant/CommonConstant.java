@@ -17,10 +17,20 @@ public class CommonConstant {
         public static final String UPDATE = "UPDATE";
     }
 
-    public static class Method {
+    public static class MethodProduct {
         public static final String FINDBYID = "findById";
-        public static final String CREATEPRODUCT = "createProduct";
+        public static final String FINDALL = "findAll";
         public static final String UPDATEPRODUCT = "updateProduct";
+
+    }
+    public static class MethodUser {
+        public static final String GETBYID = "getById";
+        public static final String FINDALLUSER = "findAllUser";
+        public static final String UPDATEUSER = "updateUser";
+        public static final String ADDROLERFORUSER = "addRoleForUser";
+        public static final String DELETEUSER = "deleteUser";
+        public static final String SIGNUP = "signUp";
+        public static final String SIGIN = "signIn";
 
     }
 }

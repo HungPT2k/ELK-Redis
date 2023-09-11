@@ -1,4 +1,4 @@
-package com.example.elkredis.model;
+package com.example.elkredis.DTO.Response;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

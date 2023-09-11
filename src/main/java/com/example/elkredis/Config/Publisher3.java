@@ -1,10 +1,9 @@
 package com.example.elkredis.Config;
 
-import com.example.elkredis.model.MessageDTO1;
+import com.example.elkredis.DTO.Request.MessageDTO1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +24,11 @@ public class Publisher3 {
 
         redisTemplate.convertAndSend(topicA.getTopic(), messageDTO);
         System.out.println("Sending request  to A: " );
+    }
+    public void publishToB(MessageDTO1 messageDTO) {
+
+        redisTemplate.convertAndSend(topicB.getTopic(), messageDTO);
+        System.out.println("Sending request  to B: " );
     }
 
 

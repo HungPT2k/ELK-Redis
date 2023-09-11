@@ -1,6 +1,6 @@
 package com.example.elkredis.Config;
 
-import com.example.elkredis.model.MessageDTO1;
+import com.example.elkredis.DTO.Request.MessageDTO1;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -59,21 +59,21 @@ public class RedisConfig extends CachingConfigurerSupport {
         return new ChannelTopic("Customer-server");
     }
     @Bean
-    RedisMessageListenerContainer container(MessageListenerAdapter messageListenerA) {
+    RedisMessageListenerContainer container(MessageListenerAdapter messageListenerA,MessageListenerAdapter messageListenerB) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-//        container.addMessageListener(messageListenerB(), topicB());
+      container.addMessageListener(messageListenerB, topicB());
         container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(messageListenerA, topicA());
 
         return container;
     }
 
-    //    @Bean
-//    MessageListenerAdapter messageListenerB() {
-//        return new MessageListenerAdapter(new receiver());
-//    }
+        @Bean
+    MessageListenerAdapter messageListenerB(ReceiverUser receiverUser) {
+        return new MessageListenerAdapter(receiverUser);
+    }
     @Bean
-    MessageListenerAdapter messageListenerA(receiver3 receiver3) {
+    MessageListenerAdapter messageListenerA(ReceiverProduct receiver3) {
         return new MessageListenerAdapter(receiver3);
     }
     @Bean

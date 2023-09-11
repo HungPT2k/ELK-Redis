@@ -1,5 +1,6 @@
-package com.example.elkredis.Service;
+package com.example.elkredis.Service.Ipml;
 
+import com.example.elkredis.Service.IelkService;
 import com.example.elkredis.model.Product;
 import com.example.elkredis.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 @Component
-public class ElkService implements IelkService{
+public class ElkService implements IelkService {
     @Autowired
     private ProductRepository productRepository;
 
