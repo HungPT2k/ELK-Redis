@@ -19,13 +19,8 @@ import java.util.HashMap;
 @RedisHash
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageDTO implements Serializable {
-//    private String nameServer;
-//    private String messDetail;
+   private String messDetail;
     private String method;
-//    @JacksonXmlProperty(localName = "parameters")
-//    @JacksonXmlElementWrapper(localName = "parameters")
-//    private HashMap<String,String> parameters;
-//    @JsonProperty( "object" )
-//    private Object object;
+
 
 }

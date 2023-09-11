@@ -21,24 +21,17 @@ public class Publisher3 {
     private ChannelTopic topicB;
 
 
-    public void publishAtoB(MessageDTO1 messageDTO) {
+    public void publishToA(MessageDTO1 messageDTO) {
 
-        redisTemplate.convertAndSend("Product-server", messageDTO);
-        System.out.println("Sending message A to B: " );
+        redisTemplate.convertAndSend(topicA.getTopic(), messageDTO);
+        System.out.println("Sending request  to A: " );
     }
 
 
-    public void publishBtoA(MessageDTO1 messageDTO) {
-
-        redisTemplate.convertAndSend("Customer-server", messageDTO);
-        System.out.println("Sending message B to A: ");
-    }
-
-
-    public void pushApiToRedisQueue( MessageDTO1 messageDTO1) {
+    public void addGuiRedis( MessageDTO1 messageDTO1) {
 
         redisTemplate.opsForList().leftPush(messageDTO1.getMethod(),messageDTO1);
-        System.out.println("Sending api to Rqueue: ");
+        System.out.println("add request to redis gui: ");
     }
 
 

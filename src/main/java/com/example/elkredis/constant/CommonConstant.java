@@ -19,8 +19,10 @@ public class CommonConstant {
 
     public static class Method {
         public static final String FINDBYID = "findById";
+        public static final String FINDALL = "findAll";
         public static final String CREATEPRODUCT = "createProduct";
         public static final String UPDATEPRODUCT = "updateProduct";
+
 
     }
 }

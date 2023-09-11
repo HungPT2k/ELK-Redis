@@ -17,7 +17,4 @@ public class MessageDTO1 implements Serializable {
     private String messDetail;
     private String method;
     private String time;
-//    private String nameServer;
-//    private HashMap<String,String> parameters;
-//    private Object object;
 }
