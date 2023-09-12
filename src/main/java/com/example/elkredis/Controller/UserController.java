@@ -32,7 +32,7 @@ public class UserController {
     };
     @GetMapping(path = "/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')")
-    List<Users> getAllUser(){
+    ResponseObjectDTO getAllUser(){
         return userService.getAllUser();
     }
     @GetMapping("/deleteOK/{id}")

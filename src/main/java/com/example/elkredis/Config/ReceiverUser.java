@@ -1,11 +1,16 @@
 package com.example.elkredis.Config;
 
+import com.example.elkredis.DTO.Request.LoginRequestDTO;
 import com.example.elkredis.DTO.Request.MessageDTO1;
+import com.example.elkredis.DTO.Request.UserUpdateDTO;
 import com.example.elkredis.DTO.Response.MessageDTO;
 import com.example.elkredis.DTO.Response.ResponseCommon;
-import com.example.elkredis.Service.IelkService;
+import com.example.elkredis.DTO.Response.ResponseObjectDTO;
+import com.example.elkredis.Service.AuthService;
+
+import com.example.elkredis.Service.UserService;
 import com.example.elkredis.constant.CommonConstant;
-import com.example.elkredis.model.Product;
+import com.example.elkredis.model.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -19,13 +24,15 @@ public class ReceiverUser implements MessageListener { // mỗi class subscriber
 
 
     private final Publisher3 publisher;
-    private final IelkService elkService;
+    private final AuthService authService;
+    private final UserService userService;
     public static boolean check = false;
     ObjectMapper mapper = new ObjectMapper();
 
-    public ReceiverUser(Publisher3 publisher, IelkService elkService) {
+    public ReceiverUser(Publisher3 publisher, AuthService authService, UserService userService) {
         this.publisher = publisher;
-        this.elkService = elkService;
+        this.authService = authService;
+        this.userService = userService;
     }
 
     // Nhận message của chanel đã subscriber
@@ -37,19 +44,28 @@ public class ReceiverUser implements MessageListener { // mỗi class subscriber
             // quan sát request nhận đc trên redis gui
             publisher.addGuiRedis(new MessageDTO1("", m.getMethod(), myObj.toString()));
             switch (Objects.requireNonNull(m).getMethod()) {
+
+                case CommonConstant.MethodUser.SIGNUP:
+                    System.out.println("SigUp .............ok");
+                    check = true;
+                    break;
+                case CommonConstant.MethodUser.SIGIN:
+                    System.out.println("SigIn .............ok");
+                    check = true;
+                    break;
                 case CommonConstant.MethodUser.GETBYID:
-                    System.out.println("findByid .............ok");
+                    System.out.println("findByid user.............ok");
                     check = true;
                     break;
 
                 case CommonConstant.MethodUser.UPDATEUSER:
 
-                    System.out.println("update .............ok");
+                    System.out.println("update user.............ok");
                     check = true;
                     break;
 
                 case CommonConstant.MethodUser.FINDALLUSER:
-                    System.out.println("findAll .............ok");
+                    System.out.println("findAll user.............ok");
                     check = true;
                     break;
                 default:
@@ -67,63 +83,79 @@ public class ReceiverUser implements MessageListener { // mỗi class subscriber
     }
 
     // method sẽ gọi đến redis queue trước khi dc thực thi
-    public ResponseCommon findById(Long id) throws InterruptedException {
+    public ResponseObjectDTO SignUp(Users users) throws InterruptedException {
         check = false;
-        ResponseCommon res;
+        ResponseObjectDTO res;
         MessageDTO1 messageDTO = new MessageDTO1();
         messageDTO.setMethod(CommonConstant.MethodUser.GETBYID);
-        messageDTO.setMessDetail("get product by id");
-        System.out.println(elkService.findById(id).get().getName() + "-------------");
+        messageDTO.setMessDetail("get user by id");
         publisher.publishToA(messageDTO);
         long startTime = System.currentTimeMillis(); //fetch starting time
         while (!check && (System.currentTimeMillis() - startTime) < 2000) {
             res = null;
         }
         if (check) {
-            res = new ResponseCommon("200", "Get product by id " + id, elkService.findById(id));
+            res =  authService.signUp(users);
         } else {
-            res = new ResponseCommon("200", "queue null", null);
+            res = new ResponseObjectDTO("200", "queue null", null);
         }
         return res;
     }
 
 
-    public ResponseCommon updateProduct(Long id, Product product) throws InterruptedException {
+    public ResponseObjectDTO SignIn(LoginRequestDTO loginRequestDTO) throws InterruptedException {
         check = false;
-        ResponseCommon res;
+        ResponseObjectDTO res;
         MessageDTO1 messageDTO = new MessageDTO1();
-        messageDTO.setMethod(CommonConstant.MethodUser.UPDATEUSER);
-        messageDTO.setMessDetail("Update product by id");
+        messageDTO.setMethod(CommonConstant.MethodUser.SIGIN);
+        messageDTO.setMessDetail("Login user ..");
         publisher.publishToA(messageDTO);
         long startTime = System.currentTimeMillis(); //fetch starting time
         while (!check && (System.currentTimeMillis() - startTime) < 2000) {
             res = null;
         }
         if (check) {
-            res = new ResponseCommon("200", "Update  product by id"+ id, elkService.UpdateProduct(id,product));
+            res = authService.signIn(loginRequestDTO);
         } else {
-            res = new ResponseCommon("200", "queue null", null);
+            res = new ResponseObjectDTO("200", "queue null", null);
         }
         return res;
     }
 
 
-    public ResponseCommon findAllProduct() {
+    public ResponseObjectDTO findAllUser() {
         check = false;
-        ResponseCommon res;
+        ResponseObjectDTO res;
         MessageDTO1 messageDTO1 = new MessageDTO1();
         messageDTO1.setMethod(CommonConstant.MethodUser.FINDALLUSER);
-        messageDTO1.setMessDetail("Find all product");
-        System.out.println(elkService.findAll().get(0).getName() + "____________");
+        messageDTO1.setMessDetail("Find all user");
         publisher.publishToA(messageDTO1);
         long startTime = System.currentTimeMillis(); //fetch starting time
         while (!check && (System.currentTimeMillis() - startTime) < 2000) {
             res = null;
         }
         if (check) {
-            res = new ResponseCommon("200", "Find all product ", elkService.findAll());
+            res = userService.getAllUser();
         } else {
-            res = new ResponseCommon("200", "queue null", null);
+            res = new ResponseObjectDTO("200", "queue null", null);
+        }
+        return res;
+    }
+    public ResponseObjectDTO updateUser(Long id , UserUpdateDTO userUpdateDTO) {
+        check = false;
+        ResponseObjectDTO res;
+        MessageDTO1 messageDTO1 = new MessageDTO1();
+        messageDTO1.setMethod(CommonConstant.MethodUser.UPDATEUSER);
+        messageDTO1.setMessDetail("Update user");
+        publisher.publishToA(messageDTO1);
+        long startTime = System.currentTimeMillis(); //fetch starting time
+        while (!check && (System.currentTimeMillis() - startTime) < 2000) {
+            res = null;
+        }
+        if (check) {
+            res = userService.updateUser(userUpdateDTO,id);
+        } else {
+            res = new ResponseObjectDTO("200", "queue null", null);
         }
         return res;
     }
