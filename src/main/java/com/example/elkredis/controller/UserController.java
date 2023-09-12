@@ -1,4 +1,4 @@
-package com.example.elkredis.Controller;
+package com.example.elkredis.controller;
 
 import com.example.elkredis.DTO.Request.AddRoleRequestDTO;
 import com.example.elkredis.DTO.Request.LoginRequestDTO;
