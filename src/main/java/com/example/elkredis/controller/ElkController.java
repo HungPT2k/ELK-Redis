@@ -1,4 +1,4 @@
-package com.example.elkredis.controller;
+package com.example.elkredis.Controller;
 import com.example.elkredis.Config.ReceiverProduct;
 import com.example.elkredis.DTO.Response.ResponseCommon;
 import com.example.elkredis.elastic.Service.ElasticService;

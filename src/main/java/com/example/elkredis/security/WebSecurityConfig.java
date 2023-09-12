@@ -37,9 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers("/user/signin", "/user/signup", "/user/deleteOK/**", "/user/home").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
-                .and().authorizeRequests()
-                .anyRequest().authenticated();
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll();
+
 
         http.exceptionHandling().accessDeniedPage("/login");
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));

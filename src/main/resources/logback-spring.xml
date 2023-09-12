@@ -1,19 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
-
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>D:/ELK/docker-loging-elk-master/logstash/log/logstash.txt</file>
+    <!-- Cấu hình appneder cho log ERROR -->
+    <!--    <appender name="Error" class="ch.qos.logback.core.FileAppender">-->
+    <!--        <file>logs/application.log</file>-->
+    <!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+    <!--            <level>ERROR</level>-->
+    <!--            <onMatch>ACCEPT</onMatch>-->
+    <!--            <onMismatch>DENY</onMismatch>-->
+    <!--        </filter>-->
+    <!--        <encoder>-->
+    <!--            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+    <!--        </encoder>-->
+    <!--    </appender>-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="Info" class="ch.qos.logback.core.FileAppender" >
+        <file>E:\Spring-learning\ELK-Redis\logs\application.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Logger sử dụng appender đã cấu hình -->
-    <logger name="com.example.elkdemo.controller" level="INFO">
-        <appender-ref ref="FILE" />
+    <!-- Cấu hình logger cho log INFO -->
+    <logger name="com.example.elkredis.Controller" level="INFO">
+        <appender-ref ref="Info" />
     </logger>
 
-    <!--    <logger name="org.springframework.data.elasticsearch.client" level="trace"/>-->
+    <!--    &lt;!&ndash; Cấu hình logger cho log ERROR &ndash;&gt;-->
+    <!--    <logger name="com.example.elkredis" level="ERROR">-->
+    <!--        <appender-ref ref="Error" />-->
+    <!--    </logger>-->
+
+    <!-- Cấu hình root logger để đọc log toàn hệ thống-->
+    <root level="INFO">
+        <appender-ref ref="Info" />
+        <appender-ref ref="console" />
+        <!--        <appender-ref ref="Error" />-->
+    </root>
 
 </configuration>
