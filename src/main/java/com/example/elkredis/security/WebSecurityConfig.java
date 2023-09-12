@@ -20,6 +20,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String[] AUTH_LIST = {
+            // -- swagger ui
+            "**/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+
     @Autowired
     @Lazy
     private JwtTokenProvider jwtTokenProvider;
@@ -36,13 +45,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/user/signin", "/user/signup", "/user/deleteOK/**", "/user/home").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/user/signin", "/user/signup", "/user/deleteOK/**", "/user/home","/swagger-ui.html").permitAll();
 
         http.exceptionHandling().accessDeniedPage("/login");
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+
+
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
