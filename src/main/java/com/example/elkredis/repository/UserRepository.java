@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<Users,Long> {
     @Query(value = "SELECT * FROM User WHERE name_user like ?1",nativeQuery = true)
     List<Users> checkExitUser(String name);
 
-    @Cacheable(value = "getAllUser", cacheManager = "cacheManager1")
+    @Cacheable(value = "getAllUser", cacheManager = "cacheManager")
     List<Users> findAll();
 
 
