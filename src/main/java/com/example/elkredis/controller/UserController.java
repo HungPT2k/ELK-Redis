@@ -72,7 +72,7 @@ public class UserController {
 
 
     @PostMapping("/auth/addRole")
-    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    @PreAuthorize("hasRole('ROLE_SUPERADMIN')")
     public ResponseObjectDTO addRole(@RequestBody AddRoleRequestDTO addRoleRequestDTO){
         return userService.addRoleForUser(addRoleRequestDTO);
     }
