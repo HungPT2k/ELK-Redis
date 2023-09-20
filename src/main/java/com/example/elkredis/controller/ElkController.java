@@ -29,9 +29,6 @@ public class ElkController {
         log.info("Inside Hello World Function");
         String response = "Hello World! " + new Date();
         log.info("Response => {}",response);
-    //   ResponseCommon responseCommon=
-
-
         return  re.findById(id);
     }
     @PutMapping(value = "/update/{id}")

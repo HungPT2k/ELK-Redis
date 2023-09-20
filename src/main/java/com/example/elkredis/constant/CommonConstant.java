@@ -30,7 +30,9 @@ public class CommonConstant {
         public static final String ADDROLERFORUSER = "addRoleForUser";
         public static final String DELETEUSER = "deleteUser";
         public static final String SIGNUP = "signUp";
-        public static final String SIGIN = "signIn";
+        public static final String SIGNIN = "signIn";
+        public static final String UPDATEALLUSER = "updateAllUser";
+
 
     }
 }

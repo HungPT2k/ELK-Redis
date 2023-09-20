@@ -27,7 +27,7 @@ public class UserPrincipal implements UserDetails {
         for (String role : roles) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role));
         }
-        return new UserPrincipal(user.getId(), user.getEmail(), user.getPassWordUser(), grantedAuthorities);
+        return new UserPrincipal(user.getId(), user.getNameUser(), user.getPassWordUser(), grantedAuthorities);
     }
 
     public static UserPrincipal create(Users user, Map<String, Object> attributes) {

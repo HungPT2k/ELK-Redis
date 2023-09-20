@@ -42,7 +42,9 @@ public class AuthServiceIml implements AuthService {
             user.setUserName(users.get(0).getNameUser());
             user.setEmail(users.get(0).getEmail());
             user.setRole(users.get(0).getRole());
+            user.setFullName(users.get(0).getFullName());
             user.setToken(token);
+            user.setId(users.get(0).getId());
             return new ResponseObjectDTO("200", "Signin successfully ", user);
         } catch (AuthenticationException e) {
             return new ResponseObjectDTO("500", "Signin fail, name or pass is wrong ", null);
@@ -64,9 +66,11 @@ public class AuthServiceIml implements AuthService {
             user.setEmail(appUser.getEmail());
             user.setRole(appUser.getRole());
             user.setToken("");
+            user.setId(appUser.getId());
+            user.setFullName(appUser.getFullName());
             return new ResponseObjectDTO("200", "SignUp successfully ", user);
         } else {
-            return new ResponseObjectDTO("500", "SignUp fail ", null);
+            return new ResponseObjectDTO("500", "SignUp fail , userName or Pass is exit ", null);
         }
     }
 
@@ -74,7 +78,7 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public boolean checkExitsUser(String userName, String email) {
-        return userRepository.findByEmail(email).isEmpty() && userRepository.findUsersByNameUser(userName).isEmpty();
+        return userRepository.findByEmail(email).size()==0 && userRepository.checkExitUser(userName).size()==0;
     }
 
 }

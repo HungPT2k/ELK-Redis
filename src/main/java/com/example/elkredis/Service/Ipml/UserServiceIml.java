@@ -2,6 +2,7 @@ package com.example.elkredis.Service.Ipml;
 
 
 import com.example.elkredis.DTO.Request.AddRoleRequestDTO;
+import com.example.elkredis.DTO.Request.UserUpdateAllDTO;
 import com.example.elkredis.DTO.Request.UserUpdateDTO;
 import com.example.elkredis.DTO.Response.ResponseObjectDTO;
 import com.example.elkredis.Service.UserService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -27,40 +29,75 @@ public class UserServiceIml implements UserService {
     private final UserRepository userRepository;
 
 
-    @Cacheable(value = "getAllUser",cacheManager = "cacheManager1")
+
     @Override
     public ResponseObjectDTO getAllUser() {
 
         return new ResponseObjectDTO("200", "Get all user successfully", userRepository.findAll());
     }
 
-    @Cacheable(value = "getById",key = "#id",cacheManager = "cacheManager1")
+    @Cacheable(value = "getById", key = "#id", cacheManager = "cacheManager1")
     @Override
     public Optional<Users> getById(Long id) {
         return userRepository.findById(id);
     }
-    @CachePut(value = "getById",key = "#id")
-    @CacheEvict(value = "getAllUser", allEntries = true)
+
+
+    @CachePut(value = "getById", key = "#id")
+    @CacheEvict(value = {"getAllUser", "loadUser"}, allEntries = true)
     @Override
     public ResponseObjectDTO updateUser(UserUpdateDTO userUpdateDTO, Long id) {
-        Optional<Users> users= getById(id);
-        if(users.isEmpty()) {
+        Optional<Users> users = userRepository.findById(id);
+        if (users.isEmpty()) {
             return new ResponseObjectDTO("404", "User not found by id " + id, "");
         }
+        users.get().setNameUser(userUpdateDTO.getUserName());
+        users.get().setEmail(userUpdateDTO.getEmail());
+        users.get().setFullName(userUpdateDTO.getFullName());
+        return new ResponseObjectDTO("200", "Update user successfully with  id " + id, userRepository.save(users.get()));
 
-            users.get().setNameUser(userUpdateDTO.getUserName());
-            users.get().setEmail(userUpdateDTO.getEmail());
-            users.get().setFullName(userUpdateDTO.getFullName());
-         return   new ResponseObjectDTO("200", "Update user successfully with  id " + id, userRepository.save(users.get()));
+
+    }
+
+    @CachePut(value = "getById", key = "#id")
+    @CacheEvict(value = {"getAllUser", "loadUser"}, allEntries = true)
+    @Override
+    public ResponseObjectDTO updateUserBySuper(UserUpdateAllDTO userUpdateDTO, Long id) {
+        Optional<Users> users = userRepository.findById(id);
+        String role = null;
+        switch (userUpdateDTO.getRole().toUpperCase(Locale.ROOT)) {
+            case "ROLE_CLIENT" -> role = Roles.ROLE_CLIENT.toString();
+            case "ROLE_ADMIN" -> role = Roles.ROLE_ADMIN.toString();
+            case "ROLE_SUPERADMIN" -> role = Roles.ROLE_SUPERADMIN.toString();
+            default -> {
+            }
+        }
+        if (users.isEmpty() || role == null)
+            return new ResponseObjectDTO("404", " User or IdRole not found  " + id, "");
+        users.get().setNameUser(userUpdateDTO.getUserName());
+        users.get().setEmail(userUpdateDTO.getEmail());
+        users.get().setFullName(userUpdateDTO.getFullName());
+        users.get().setRole(role);
+        return new ResponseObjectDTO("200", "Update user successfully with  id " + id, userRepository.save(users.get()));
+
+
+    }
+
+    @CacheEvict(value = {"getAllUser", "loadUser"}, allEntries = true)
+    @Override
+    public ResponseObjectDTO deleteUser(Long id) {
+        Optional<Users> users = userRepository.findById(id);
+        if (users.isEmpty()) return new ResponseObjectDTO("404", " user not found with  id " + id, "");
+        userRepository.delete(users.get());
+        return new ResponseObjectDTO("200", "delete user successfully with  id " + id, "");
 
 
     }
 
     @Override
-    public ResponseObjectDTO deleteUser(Long id) {
+    public ResponseObjectDTO ActiveUser(Long id) {
         Optional<Users> users = getById(id);
         if (users.isEmpty()) return new ResponseObjectDTO("404", "Not found", null);
-//       if(users.get().getRole().indexOf(Roles.ROLE_SUPERADMIN.toString())>0) return new ResponseObject("403","Not claim",null);
         if (users.get().getIsDelete()) {
             users.get().setIsDelete(false);
             userRepository.save(users.get());
@@ -70,10 +107,6 @@ public class UserServiceIml implements UserService {
         userRepository.save(users.get());
         return new ResponseObjectDTO("200", "Active user by id " + id, "");
     }
-
-
-
-
 
 
     @Override
@@ -104,11 +137,17 @@ public class UserServiceIml implements UserService {
             }
         }
 
-        Optional<Users> user = getById(Long.valueOf(id));
+        Optional<Users> user = userRepository.findById(Long.valueOf(id));
         if (user.isEmpty() || role == null) return new ResponseObjectDTO("404", "User is not already ", "");
         String userRole = user.get().getRole();
+//        if (!userRole.contains(role)) {
+//            userRole = userRole + "|" + role;
+//            user.get().setRole(userRole);
+//            userRepository.save(user.get());
+//            return new ResponseObjectDTO("200", "User id " + id + " add role " + role + " successfully", user.get());
+//        }
         if (!userRole.contains(role)) {
-            userRole = userRole + "|" + role;
+            userRole = role;
             user.get().setRole(userRole);
             userRepository.save(user.get());
             return new ResponseObjectDTO("200", "User id " + id + " add role " + role + " successfully", user.get());

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdateDTO {
+public class UserUpdateAllDTO {
     @NotNull
     @NotBlank
     private String userName;
@@ -20,4 +20,7 @@ public class UserUpdateDTO {
     @NotNull
     @NotBlank
     private String email;
+    @NotNull
+    @NotBlank
+    private String role;
 }
